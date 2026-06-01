@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Jingyi Zhi · Portfolio</title>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@300;400;500;600;700&family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --charcoal: #0F0F12;
+    --charcoal-soft: #1A1A1E;
+    --charcoal-medium: #25252A;
+    --cream: #F5F0E8;
+    --cream-dim: #C9C2B5;
+    --cream-faded: #8C8478;
+    --gold: #C9A961;
+    --gold-dim: #8C7340;
+    --rust: #6B3F2A;
+    --line: rgba(245, 240, 232, 0.08);
+    --line-strong: rgba(245, 240, 232, 0.15);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  html, body { width: 100%; height: 100%; overflow: hidden; font-family: 'Inter', sans-serif; background: var(--charcoal); color: var(--cream); }
+
+  .deck { width: 100%; height: 100%; position: relative; }
+  .slide { width: 100%; height: 100%; position: absolute; top: 0; left: 0; opacity: 0; visibility: hidden; transition: opacity 0.5s ease, visibility 0.5s ease; overflow: hidden; }
+  .slide.active { opacity: 1; visibility: visible; }
+
+  /* Navigation */
+  .nav-controls { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 1000; display: flex; gap: 16px; align-items: center; background: rgba(15, 15, 18, 0.85); padding: 10px 20px; border-radius: 100px; border: 1px solid var(--line-strong); backdrop-filter: blur(10px); }
+  .nav-btn { width: 32px; height: 32px; border-radius: 50%; background: transparent; border: 1px solid var(--line-strong); color: var(--cream); display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all 0.2s ease; font-size: 14px; }
+  .nav-btn:hover { background: var(--gold); border-color: var(--gold); color: var(--charcoal); }
+  .slide-counter { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 2px; color: var(--cream-dim); padding: 0 8px; }
+
+  /* Shared utility */
+  .eyebrow {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 3px;
+    color: var(--gold);
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .slide-num {
+    position: absolute;
+    top: 32px;
+    right: 48px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 2px;
+    color: var(--cream-faded);
+  }
+  .footer-brand {
+    position: absolute;
+    bottom: 32px;
+    left: 48px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10px;
+    letter-spacing: 3px;
+    color: var(--cream-faded);
+    text-transform: uppercase;
+  }
+
+  /* Video link buttons */
+  .video-link {
+    display: inline-block;
+    margin-top: 16px;
+    margin-right: 12px;
+    padding: 10px 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    letter-spacing: 2px;
+    color: var(--gold);
+    border: 1px solid var(--gold-dim);
+    border-radius: 4px;
+    text-decoration: none;
+    transition: all 0.2s ease;
+  }
+  .video-link:hover {
+    background: var(--gold);
+    color: var(--charcoal);
+    border-color: var(--gold);
+  }
+  .case-video-links {
+    margin-top: 16px;
+    display: flex;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  /* ═════ SLIDE 01: COVER ═════ */
+  .slide-01 { background: var(--charcoal); display: grid; grid-template-rows: 1fr auto; }
+  .cover-main { padding: 80px 80px 0; display: flex; flex-direction: column; justify-content: center; position: relative; }
+  .cover-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; margin-bottom: 24px; }
+  .cover-name { font-family: 'Cormorant Garamond', serif; font-size: clamp(64px, 9vw, 130px); font-weight: 300; line-height: 1; letter-spacing: -2px; color: var(--cream); margin-bottom: 24px; }
+  .cover-name em { font-style: italic; color: var(--gold); font-weight: 400; }
+  .cover-subtitle { font-family: 'Cormorant Garamond', serif; font-size: clamp(20px, 2vw, 28px); font-weight: 400; color: var(--cream-dim); line-height: 1.4; max-width: 700px; font-style: italic; }
+  .cover-footer { padding: 32px 80px; display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid var(--line-strong); }
+  .cover-contact { display: flex; gap: 48px; }
+  .contact-item .label { font-family: 'JetBrains Mono', monospace; font-size: 10px; letter-spacing: 2px; color: var(--cream-faded); text-transform: uppercase; margin-bottom: 6px; }
+  .contact-item .value { font-size: 14px; color: var(--cream); }
+  .cover-date { font-family: 'JetBrains Mono', monospace; font-size: 11px; letter-spacing: 2px; color: var(--cream-faded); }
+
+  /* ═════ SLIDE 02: ABOUT ═════ */
+  .slide-02 { background: var(--charcoal); padding: 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 80px; align-items: center; }
+  .about-left .eyebrow { margin-bottom: 24px; }
+  .about-heading { font-family: 'Cormorant Garamond', serif; font-size: clamp(48px, 5.5vw, 80px); font-weight: 300; line-height: 1.1; color: var(--cream); letter-spacing: -1px; }
+  .about-heading em { font-style: italic; color: var(--gold); font-weight: 400; }
+  .about-right .body { font-size: 16px; line-height: 1.8; color: var(--cream-dim); margin-bottom: 32px; }
+  .about-right .body strong { color: var(--cream); font-weight: 500; }
+  .about-tags { display: flex; flex-wrap: wrap; gap: 8px; }
+  .about-tag { padding: 8px 14px; border: 1px solid var(--line-strong); border-radius: 100px; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--cream); letter-spacing: 1px; }
+
+  /* ═════ SLIDE 03: SELECTED WORK INTRO ═════ */
+  .slide-03 { background: var(--charcoal); padding: 80px; display: flex; flex-direction: column; justify-content: center; }
+  .work-intro-header { margin-bottom: 60px; }
+  .work-intro-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(48px, 5.5vw, 80px); font-weight: 300; line-height: 1.1; color: var(--cream); letter-spacing: -1px; }
+  .work-intro-title em { font-style: italic; color: var(--gold); font-weight: 400; }
+  .work-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; }
+  .work-card { padding: 32px 24px; background: var(--charcoal-soft); border-top: 2px solid var(--gold); display: flex; flex-direction: column; gap: 12px; }
+  .work-card .work-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gold); letter-spacing: 2px; }
+  .work-card .work-name { font-family: 'Cormorant Garamond', serif; font-size: 24px; color: var(--cream); font-weight: 500; line-height: 1.3; }
+  .work-card .work-meta { font-size: 13px; color: var(--cream-faded); line-height: 1.6; }
+
+  /* ═════ CASE PAGE LAYOUT ═════ */
+  .slide-04, .slide-05, .slide-07 { background: var(--charcoal); }
+  .case-page { padding: 64px 80px; display: grid; grid-template-columns: 1fr 1.2fr; gap: 64px; height: 100%; align-items: center; }
+  .case-left .case-num { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gold); letter-spacing: 3px; margin-bottom: 16px; }
+  .case-left .case-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(40px, 4.5vw, 64px); font-weight: 400; line-height: 1.1; color: var(--cream); letter-spacing: -1px; margin-bottom: 12px; }
+  .case-left .case-title em { font-style: italic; color: var(--gold); }
+  .case-left .case-client { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 2px; color: var(--cream-faded); text-transform: uppercase; margin-bottom: 32px; }
+  .case-meta { display: grid; grid-template-columns: auto 1fr; gap: 12px 24px; margin-bottom: 32px; }
+  .case-meta-label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--cream-faded); letter-spacing: 2px; text-transform: uppercase; }
+  .case-meta-value { font-size: 14px; color: var(--cream); }
+  .case-right { display: flex; flex-direction: column; gap: 20px; }
+  .case-section { }
+  .case-section h4 { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 10px; }
+  .case-section p { font-size: 14px; color: var(--cream-dim); line-height: 1.7; }
+  .case-section p em { color: var(--cream); font-style: italic; }
+  .case-quote { padding: 20px 24px; border-left: 2px solid var(--gold); margin-top: 12px; }
+  .case-quote p { font-family: 'Cormorant Garamond', serif; font-size: 18px; font-style: italic; color: var(--cream); line-height: 1.5; margin-bottom: 8px; }
+  .case-quote .attr { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--cream-faded); letter-spacing: 2px; text-transform: uppercase; }
+
+  /* ═════ Case study detail page ═════ */
+  .case-detail { padding: 64px 80px; height: 100%; display: flex; flex-direction: column; }
+  .case-detail-header { margin-bottom: 40px; }
+  .case-detail-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--gold); letter-spacing: 3px; margin-bottom: 8px; }
+  .case-detail-title { font-family: 'Cormorant Garamond', serif; font-size: 36px; font-weight: 400; color: var(--cream); }
+  .case-detail-title em { font-style: italic; color: var(--gold); }
+  .case-detail-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 32px; flex: 1; align-content: start; }
+  .case-detail-card h5 { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--gold); letter-spacing: 3px; margin-bottom: 12px; text-transform: uppercase; }
+  .case-detail-card p { font-size: 14px; color: var(--cream-dim); line-height: 1.7; }
+  .case-detail-card p em { color: var(--cream); font-style: italic; }
+
+  /* ═════ SLIDE 08: PERSONAL PROJECT ═════ */
+  .slide-08 { background: var(--charcoal); padding: 64px 80px; display: grid; grid-template-columns: 1fr 1fr; gap: 64px; align-items: center; }
+  .personal-left .eyebrow { margin-bottom: 16px; }
+  .personal-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(40px, 4.5vw, 64px); font-weight: 400; line-height: 1.1; color: var(--cream); letter-spacing: -1px; margin-bottom: 16px; }
+  .personal-title em { font-style: italic; color: var(--gold); }
+  .personal-meta { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 2px; color: var(--cream-faded); margin-bottom: 32px; text-transform: uppercase; }
+  .personal-text { font-size: 15px; color: var(--cream-dim); line-height: 1.8; }
+  .personal-text em { color: var(--cream); font-style: italic; }
+  .personal-right { display: flex; flex-direction: column; gap: 16px; }
+  .personal-right h4 { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--gold); letter-spacing: 3px; }
+  .personal-right .credit { font-size: 14px; color: var(--cream); }
+  .personal-right .credit em { color: var(--cream-dim); font-style: italic; }
+
+  /* ═════ SLIDE 09: BACKGROUND & SKILLS ═════ */
+  .slide-09 { background: var(--charcoal); padding: 64px 80px; }
+  .bg-header { margin-bottom: 48px; }
+  .bg-title { font-family: 'Cormorant Garamond', serif; font-size: clamp(40px, 4.5vw, 64px); font-weight: 400; line-height: 1.1; color: var(--cream); letter-spacing: -1px; }
+  .bg-title em { font-style: italic; color: var(--gold); }
+  .bg-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 64px; }
+  .bg-section h4 { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--gold); letter-spacing: 3px; text-transform: uppercase; margin-bottom: 20px; padding-bottom: 12px; border-bottom: 1px solid var(--line-strong); }
+  .bg-item { margin-bottom: 20px; display: grid; grid-template-columns: auto 1fr; gap: 20px; }
+  .bg-item-year { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--cream-faded); letter-spacing: 1px; padding-top: 4px; }
+  .bg-item-main h5 { font-family: 'Cormorant Garamond', serif; font-size: 18px; color: var(--cream); font-weight: 500; margin-bottom: 4px; }
+  .bg-item-main p { font-size: 13px; color: var(--cream-dim); line-height: 1.6; }
+  .skill-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+  .skill-tag { padding: 6px 12px; border: 1px solid var(--line-strong); border-radius: 100px; font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--cream); letter-spacing: 1px; }
+
+  /* ═════ SLIDE 10: CONTACT ═════ */
+  .slide-10 { background: var(--charcoal); display: flex; flex-direction: column; justify-content: center; align-items: flex-start; padding: 80px; }
+  .contact-eyebrow { font-family: 'JetBrains Mono', monospace; font-size: 12px; letter-spacing: 4px; color: var(--gold); text-transform: uppercase; margin-bottom: 32px; }
+  .contact-headline { font-family: 'Cormorant Garamond', serif; font-size: clamp(56px, 7vw, 110px); font-weight: 300; line-height: 1; color: var(--cream); letter-spacing: -2px; margin-bottom: 24px; }
+  .contact-headline em { font-style: italic; color: var(--gold); font-weight: 400; }
+  .contact-sub { font-family: 'Cormorant Garamond', serif; font-size: 22px; color: var(--cream-dim); font-style: italic; margin-bottom: 64px; max-width: 700px; line-height: 1.5; }
+  .contact-grid { display: grid; grid-template-columns: repeat(3, auto); gap: 64px; }
+  .contact-grid .label { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--cream-faded); letter-spacing: 2px; text-transform: uppercase; margin-bottom: 8px; }
+  .contact-grid .value { font-size: 16px; color: var(--cream); }
+  .contact-grid .value strong { color: var(--gold); font-weight: 500; }
+
+</style>
+</head>
+<body>
+
+<div class="deck">
+
+  <!-- ═════════ SLIDE 01: COVER ═════════ -->
+  <div class="slide slide-01 active">
+    <div class="cover-main">
+      <div class="cover-eyebrow">Selected Work · 2026</div>
+      <div class="cover-name">Jingyi<br><em>Zhi</em></div>
+      <div class="cover-subtitle">Creative Producer & Content Strategist · Sydney</div>
+    </div>
+    <div class="cover-footer">
+      <div class="cover-contact">
+        <div class="contact-item"><div class="label">Email</div><div class="value">giazhi@outlook.com</div></div>
+        <div class="contact-item"><div class="label">Location</div><div class="value">Sydney, Australia</div></div>
+        <div class="contact-item"><div class="label">LinkedIn</div><div class="value">/in/jingyi-zhi</div></div>
+      </div>
+      <div class="cover-date">2026</div>
+    </div>
+  </div>
+
+  <!-- ═════════ SLIDE 02: ABOUT ═════════ -->
+  <div class="slide slide-02">
+    <span class="slide-num">02 / 10</span>
+    <div class="about-left">
+      <div class="eyebrow">About</div>
+      <div class="about-heading">Commercial thinking, <em>creative execution.</em></div>
+    </div>
+    <div class="about-right">
+      <p class="body">
+        I'm a Sydney-based creative producer with a background spanning <strong>finance, media, and documentary filmmaking</strong>. USYD double major in Finance & Media Studies, with a documentary research program at UCL. Bilingual in English and Chinese.
+      </p>
+      <p class="body">
+        My work sits at the intersection of <strong>brand strategy, visual storytelling, and user understanding</strong> — I think about why a piece of content needs to exist before I think about how it should look. The result is work that's commercially sharp and visually considered.
+      </p>
+      <div class="about-tags">
+        <div class="about-tag">Brand films</div>
+        <div class="about-tag">Content strategy</div>
+        <div class="about-tag">User research</div>
+        <div class="about-tag">Photography</div>
+        <div class="about-tag">EN + CN</div>
+      </div>
+    </div>
+    <div class="footer-brand">Jingyi Zhi · Portfolio 2026</div>
+  </div>
+
+  <!-- ═════════ SLIDE 03: SELECTED WORK INTRO ═════════ -->
+  <div class="slide slide-03">
+    <span class="slide-num">03 / 10</span>
+    <div class="work-intro-header">
+      <div class="eyebrow">Selected Work</div>
+      <div class="work-intro-title">Three projects, <em>three modes</em> of work.</div>
+    </div>
+    <div class="work-grid">
+      <div class="work-card">
+        <div class="work-num">CASE 01</div>
+        <div class="work-name">Green Vista —<br>Brand Film</div>
+        <div class="work-meta">120+ residence community in Leppington, NSW. Cinematography, edit, full delivery.</div>
+      </div>
+      <div class="work-card">
+        <div class="work-num">CASE 02</div>
+        <div class="work-name">AI Career Platform —<br>Research</div>
+        <div class="work-meta">Beta research strategy for a Sydney AI startup. Under NDA.</div>
+      </div>
+      <div class="work-card">
+        <div class="work-num">CASE 03</div>
+        <div class="work-name">Boutique Salon —<br>Content Strategy</div>
+        <div class="work-meta">Content system + production for a design-led salon. Foundation phase.</div>
+      </div>
+    </div>
+    <div class="footer-brand">Jingyi Zhi · Portfolio 2026</div>
+  </div>
+
+  <!-- ═════════ SLIDE 04: CASE 01 GREEN VISTA ═════════ -->
+  <div class="slide slide-04">
+    <span class="slide-num">04 / 10</span>
+    <div class="case-page">
+      <div class="case-left">
+        <div class="case-num">CASE STUDY 01</div>
+        <div class="case-title">Green <em>Vista</em></div>
+        <div class="case-client">Brand Film · 2026</div>
+        <div class="case-meta">
+          <div class="case-meta-label">Client</div><div class="case-meta-value">Green Vista, Leppington NSW</div>
+          <div class="case-meta-label">Type</div><div class="case-meta-value">Masterplanned residential community</div>
+          <div class="case-meta-label">My role</div><div class="case-meta-value">Director · Producer · Cinematographer · Editor</div>
+          <div class="case-meta-label">Timeline</div><div class="case-meta-value">~3 weeks · concept to delivery</div>
+        </div>
+      </div>
+      <div class="case-right">
+        <div class="case-section">
+          <h4>The Brief</h4>
+          <p>A 120+ residence masterplanned community in <em>Sydney's Southwest growth corridor</em>, near the future Western Sydney Airport. The client needed a brand film that looked premium without an agency budget — and someone who could think about <em>what to show</em>, not just <em>how to shoot</em>.</p>
+        </div>
+        <div class="case-section">
+          <h4>My Approach</h4>
+          <p>I started with the <em>commercial fundamentals</em>: who's actually buying, what they care about, what would emotionally trigger an enquiry. I built the film around three beats matched to the buyer's journey — <em>arrival, space, belonging</em>. Aesthetic in service of marketing logic, not separate from it.</p>
+        </div>
+        <div class="case-quote">
+          <p>"Captured the project's core message and atmosphere — knew how to find what mattered."</p>
+          <div class="attr">— Green Vista</div>
+        </div>
+        <a href="https://youtu.be/SePlKJwLjmI" target="_blank" class="video-link">▶ Watch the brand film</a>
+      </div>
+    </div>
+    <div class="footer-brand">Jingyi Zhi · Portfolio 2026</div>
+  </div>
+
+  <!-- ═════════ SLIDE 05: CASE 02 AI RESEARCH ═════════ -->
+  <div class="slide slide-05">
+    <span class="slide-num">05 / 10</span>
+    <div class="case-page">
+      <div class="case-left">
+        <div class="case-num">CASE STUDY 02</div>
+        <div class="case-title">AI Career<br><em>Platform</em></div>
+        <div class="case-client">Beta Research · Under NDA</div>
+        <div class="case-meta">
+          <div class="case-meta-label">Client</div><div class="case-meta-value">Sydney-based AI startup (NDA)</div>
+          <div class="case-meta-label">Type</div><div class="case-meta-value">User research strategy & execution</div>
+          <div class="case-meta-label">My role</div><div class="case-meta-value">Research lead — strategy, instruments, interviews, synthesis</div>
+          <div class="case-meta-label">Timeline</div><div class="case-meta-value">~4 weeks</div>
+        </div>
+      </div>
+      <div class="case-right">
+        <div class="case-section">
+          <h4>The Brief</h4>
+          <p>An AI career platform preparing for beta launch needed to validate three things: <em>does the product solve a real problem, who are the ideal users, and what needs to change before paid conversion</em>. The founders needed someone to design the entire research framework — not just run a focus group.</p>
+        </div>
+        <div class="case-section">
+          <h4>My Approach</h4>
+          <p>I built a <em>multi-stage research pipeline</em> from scratch — screening to onboarding to structured feedback to in-depth 1-on-1 interviews. I wrote all three research instruments, conducted user interviews directly, and synthesised three rounds of findings into product and UX recommendations.</p>
+          <p style="margin-top: 12px;">What set this engagement apart wasn't just the methodology — it was the iteration. <em>Interviews ran in rounds rather than a single fixed batch.</em> After each round, I revised the question set and re-selected participants based on what we'd learned. The research design evolved with the findings, instead of being locked in at the start.</p>
+        </div>
+        <div class="case-quote">
+          <p>"Exactly what we needed to make decisions about our next phase."</p>
+          <div class="attr">— Founder · AI Career Platform (NDA)</div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-brand">Jingyi Zhi · Portfolio 2026</div>
+  </div>
+
+  <!-- ═════════ SLIDE 06: CASE 02 DETAIL — METHODOLOGY ═════════ -->
+  <div class="slide slide-06">
+    <span class="slide-num">06 / 10</span>
+    <div class="case-detail">
+      <div class="case-detail-header">
+        <div class="case-detail-eyebrow">CASE STUDY 02 · METHODOLOGY</div>
+        <div class="case-detail-title">Research as <em>strategy</em>, not service.</div>
+      </div>
+      <div class="case-detail-grid">
+        <div class="case-detail-card">
+          <h5>01 · Strategy</h5>
+          <p>Mapped the research to <em>real business decisions</em> — willingness to pay, friction points, engagement versus drop-off — not generic product questions.</p>
+        </div>
+        <div class="case-detail-card">
+          <h5>02 · Instruments</h5>
+          <p>Designed three research instruments from scratch: screening survey, mid-experience questionnaire, and semi-structured interview guide.</p>
+        </div>
+        <div class="case-detail-card">
+          <h5>03 · Iterative Rounds</h5>
+          <p>6–10 carefully selected participants, run in <em>iterative rounds</em>. Each round informed the next round's questions and participant criteria — research as a living process, not a fixed script.</p>
+        </div>
+        <div class="case-detail-card">
+          <h5>04 · Synthesis</h5>
+          <p>Three rounds of synthesis, translating raw user voice into <em>product insights and UX recommendations</em> the team could act on this week.</p>
+        </div>
+        <div class="case-detail-card">
+          <h5>05 · Reusability</h5>
+          <p>The framework was built to be re-run — not used once. <em>Future product phases can re-execute without rebuilding.</em></p>
+        </div>
+        <div class="case-detail-card">
+          <h5>06 · Outcome</h5>
+          <p>Persona refinements, friction points the analytics had missed, and a clearer path to the platform's next phase.</p>
+        </div>
+      </div>
+    </div>
+    <div class="footer-brand">Jingyi Zhi · Portfolio 2026</div>
+  </div>
+
+  <!-- ═════════ SLIDE 07: CASE 03 BOUTIQUE SALON ═════════ -->
+  <div class="slide slide-07">
+    <span class="slide-num">07 / 10</span>
+    <div class="case-page">
+      <div class="case-left">
+        <div class="case-num">CASE STUDY 03</div>
+        <div class="case-title">Boutique<br><em>Salon</em></div>
+        <div class="case-client">Content Strategy & Production · 2025</div>
+        <div class="case-meta">
+          <div class="case-meta-label">Client</div><div class="case-meta-value">Sydney boutique hair salon (design-led)</div>
+          <div class="case-meta-label">Type</div><div class="case-meta-value">Content strategy + system design + production</div>
+          <div class="case-meta-label">My role</div><div class="case-meta-value">Strategy, creative direction, photography, video</div>
+          <div class="case-meta-label">Engagement</div><div class="case-meta-value">Foundation phase · delivered over 2 months</div>
+        </div>
+      </div>
+      <div class="case-right">
+        <div class="case-section">
+          <h4>The Brief</h4>
+          <p>A premium boutique salon with a strong in-person brand but almost <em>no digital presence</em>. Their content read like individual stylists' portfolios rather than one coherent voice — meaning if a key stylist left, the audience would go too. They needed a content approach that built something more durable.</p>
+        </div>
+        <div class="case-section">
+          <h4>My Approach</h4>
+          <p>The problem wasn't <em>too little content</em> — it was content with <em>no structure</em>. I designed a <em>three-pillar content system</em> (Meet Our Stylists / Founder Recommends / Salon Stories) so the salon's content built one consistent identity, not scattered personal brands. I wrote the approach in both English and Chinese and produced the first round of videos and photography.</p>
+        </div>
+        <div class="case-section">
+          <h4>The Outcome</h4>
+          <p>Delivered the founding content system: a bilingual content strategy (EN/CN), the three-pillar framework, and the initial signature assets — hero videos and photoshoots. I set it up so the salon's own team could keep running it, and they've continued posting on their own since.</p>
+        </div>
+        <div class="case-video-links">
+          <a href="https://youtube.com/shorts/J7hn6sNRAVM" target="_blank" class="video-link">▶ Founder stylist video</a>
+          <a href="https://youtube.com/shorts/BWzYNK9JzJo" target="_blank" class="video-link">▶ Client transformation</a>
+        </div>
+      </div>
+    </div>
+    <div class="footer-brand">Jingyi Zhi · Portfolio 2026</div>
+  </div>
+
+  <!-- ═════════ SLIDE 08: PERSONAL PROJECT ═════════ -->
+  <div class="slide slide-08">
+    <span class="slide-num">08 / 10</span>
+    <div class="personal-left">
+      <div class="eyebrow">Personal Project</div>
+      <div class="personal-title">A second-hand <em>bookshop</em>, a quieter story.</div>
+      <div class="personal-meta">Documentary · USYD · 2024</div>
+      <p class="personal-text">
+        A short documentary about a Sydney second-hand bookshop — its owner, its objects, and the slow culture it preserves in a city that's always moving on. A study in <em>place and pacing</em>.
+      </p>
+    </div>
+    <div class="personal-right">
+      <div>
+        <h4>MY ROLE</h4>
+        <p class="credit">Producer & Story Lead</p>
+      </div>
+      <div>
+        <h4>FORMAT</h4>
+        <p class="credit">Short documentary · ~8 min</p>
+      </div>
+      <div>
+        <h4>WHAT IT DEMONSTRATES</h4>
+        <p class="credit"><em>Producer thinking — making the project possible</em>, coordinating a crew, and getting a story finished. The skills that separate "can hold a camera" from "can deliver a film."</p>
+      </div>
+      <a href="https://vimeo.com/1197237899" target="_blank" class="video-link">▶ Watch the documentary</a>
+    </div>
+    <div class="footer-brand">Jingyi Zhi · Portfolio 2026</div>
+  </div>
+
+  <!-- ═════════ SLIDE 09: BACKGROUND & SKILLS ═════════ -->
+  <div class="slide slide-09">
+    <span class="slide-num">09 / 10</span>
+    <div class="bg-header">
+      <div class="eyebrow">Background</div>
+      <div class="bg-title">A double major in <em>finance and media</em>.</div>
+    </div>
+    <div class="bg-grid">
+      <div class="bg-section">
+        <h4>Education</h4>
+        <div class="bg-item">
+          <div class="bg-item-year">2025</div>
+          <div class="bg-item-main">
+            <h5>UCL Documentary Summer School</h5>
+            <p>Documentary research and production. London, UK.</p>
+          </div>
+        </div>
+        <div class="bg-item">
+          <div class="bg-item-year">2022–2025</div>
+          <div class="bg-item-main">
+            <h5>University of Sydney</h5>
+            <p>Bachelor of Arts with a double major in Finance and Media Studies.</p>
+          </div>
+        </div>
+      </div>
+      <div class="bg-section">
+        <h4>Skills</h4>
+        <div class="bg-item">
+          <div class="bg-item-year"></div>
+          <div class="bg-item-main">
+            <h5>Strategy & Research</h5>
+            <p>Content strategy, user research design, qualitative interviews, content frameworks, cross-cultural marketing.</p>
+          </div>
+        </div>
+        <div class="bg-item">
+          <div class="bg-item-year"></div>
+          <div class="bg-item-main">
+            <h5>Production</h5>
+            <p>Cinematography, photography, video editing, creative direction, post-production.</p>
+            <div class="skill-tags">
+              <div class="skill-tag">Premiere Pro</div>
+              <div class="skill-tag">CapCut</div>
+              <div class="skill-tag">Photoshop</div>
+              <div class="skill-tag">Lightroom</div>
+            </div>
+          </div>
+        </div>
+        <div class="bg-item">
+          <div class="bg-item-year"></div>
+          <div class="bg-item-main">
+            <h5>Languages</h5>
+            <p>English (professional) · Chinese (native). Bicultural work across both markets.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="footer-brand">Jingyi Zhi · Portfolio 2026</div>
+  </div>
+
+  <!-- ═════════ SLIDE 10: CONTACT ═════════ -->
+  <div class="slide slide-10">
+    <span class="slide-num">10 / 10</span>
+    <div class="contact-eyebrow">Get in touch</div>
+    <div class="contact-headline">Let's <em>talk.</em></div>
+    <div class="contact-sub">Available for full-time roles and selected project work in Sydney and remote.</div>
+    <div class="contact-grid">
+      <div>
+        <div class="label">Email</div>
+        <div class="value"><strong>giazhi@outlook.com</strong></div>
+      </div>
+      <div>
+        <div class="label">LinkedIn</div>
+        <div class="value">linkedin.com/in/jingyi-zhi</div>
+      </div>
+      <div>
+        <div class="label">Based in</div>
+        <div class="value">Sydney, Australia</div>
+      </div>
+    </div>
+    <div class="footer-brand">Jingyi Zhi · Portfolio 2026</div>
+  </div>
+
+</div>
+
+<!-- Navigation -->
+<div class="nav-controls">
+  <div class="nav-btn" id="prevBtn">←</div>
+  <div class="slide-counter" id="counter">01 / 10</div>
+  <div class="nav-btn" id="nextBtn">→</div>
+</div>
+
+<script>
+  const slides = document.querySelectorAll('.slide');
+  const total = slides.length;
+  let current = 0;
+  const counter = document.getElementById('counter');
+
+  function update() {
+    slides.forEach((s, i) => s.classList.toggle('active', i === current));
+    counter.textContent = String(current + 1).padStart(2, '0') + ' / ' + String(total).padStart(2, '0');
+  }
+  function next() { current = (current + 1) % total; update(); }
+  function prev() { current = (current - 1 + total) % total; update(); }
+
+  document.getElementById('nextBtn').addEventListener('click', next);
+  document.getElementById('prevBtn').addEventListener('click', prev);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'ArrowRight' || e.key === ' ') { e.preventDefault(); next(); }
+    if (e.key === 'ArrowLeft') { e.preventDefault(); prev(); }
+  });
+
+  let tx = null;
+  document.addEventListener('touchstart', e => { tx = e.touches[0].clientX; }, { passive: true });
+  document.addEventListener('touchend', e => {
+    if (tx === null) return;
+    const d = tx - e.changedTouches[0].clientX;
+    if (Math.abs(d) > 40) d > 0 ? next() : prev();
+    tx = null;
+  }, { passive: true });
+</script>
+</body>
+</html>
